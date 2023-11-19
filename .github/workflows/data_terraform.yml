@@ -32,7 +32,6 @@ jobs:
 
     - name: Terraform Apply
       run: |
-        cd CI-CD-Automated-ML-for-Solar-power-predictions/terraform/main.tf
         terraform apply -auto-approve
       env:
         TF_VAR_credentials_file: ${{ secrets.GCP_SA_KEY }}
