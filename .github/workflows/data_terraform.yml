@@ -32,6 +32,7 @@ jobs:
 
     - name: Terraform Apply
       run: |
+        cd $GITHUB_WORKSPACE
         terraform apply -auto-approve
       env:
         TF_VAR_credentials_file: ${{ secrets.GCP_SA_KEY }}
