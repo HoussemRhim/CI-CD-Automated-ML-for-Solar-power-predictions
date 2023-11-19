@@ -21,12 +21,26 @@ jobs:
     
     - uses: 'actions/checkout@v4'
 
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    # actions/checkout MUST come before auth
+    - uses: 'actions/checkout@v4'
+
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v1'
       with:
-        credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
+        workload_identity_provider: 'projects/273409712742/locations/global/workloadIdentityPools/demopool/providers/my-provider'
+        service_account: 'storage-admin@reflected-oath-405515.iam.gserviceaccount.com'
+    - id: 'gcloud'
+      name: 'gcloud'
+      run: |-
+        gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+        gcloud services list --project Automated ML
+        
     - name: Terraform Init
       run: terraform init
 
