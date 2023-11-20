@@ -1,19 +1,19 @@
 # main.tf
 
 provider "google" {
-  credentials = file(var.credentials_file)
-  project     = var.project_id
-  region      = var.region
+  credentials = file("./reflected-oath-405515-70b04b6190ad.json")
+  project = "reflected-oath-405515"
+  region  = "europe-west3"
 }
 
-resource "google_storage_bucket" "my_bucket" {
-  name          = var.bucket_name
-  location      = var.region
-  force_destroy = true
-
-  uniform_bucket_level_access = true
-
-  versioning {
-    enabled = true
-  }
+resource "google_storage_bucket" "my_gcs_bucket" {
+  name     = "data_bucket_raw"
+  location = "europe-west3"
+  #force_destroy = true
 }
+variable "gcp_services_account_key" {
+  description = "The GCP service account key"
+  default = ""
+  sensitive = true
+}
+
