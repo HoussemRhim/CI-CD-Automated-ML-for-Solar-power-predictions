@@ -33,7 +33,7 @@ jobs:
 
     - name: Terraform Apply
       run: |
-        echo ${{ secrets.GCP_SA_KEY }} | base64 --decode > reflected-oath-405515-70b04b6190ad.json
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > ${{ github.workspace }}/terraform/reflected-oath-405515-70b04b6190ad.json
         terraform apply -auto-approve
       env:
         TF_VAR_credentials_file: ${{ secrets.GCP_SA_KEY }}
