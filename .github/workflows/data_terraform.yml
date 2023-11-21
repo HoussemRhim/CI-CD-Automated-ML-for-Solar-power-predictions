@@ -34,7 +34,7 @@ jobs:
     - name: Terraform Apply
       run: |
         echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > ${{ github.workspace }}/terraform/reflected-oath-405515-70b04b6190ad.json
-        terraform apply -auto-approve -var 'data_bucket_raw' -var 'data_bucket_processed'
+        terraform apply -auto-approve -var="my_gcs_bucket=data_bucket_raw" -var="my_gcs_bucket2=data_bucket_processed"
       env:
         TF_VAR_credentials_file: ${{ secrets.GCP_SA_KEY }}
         TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
