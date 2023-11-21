@@ -1,12 +1,16 @@
+import os
 import pandas as pd
 from google.cloud import storage
 
 
 # Set the project ID
 PROJECT_ID = "reflected-oath-405515"
+# Set the path to your JSON credentials file
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./terraform/reflected-oath-405515-70b04b6190ad.json"
 
 def download_from_gcs(bucket_name, blob_name):
     """Downloads a DataFrame from Google Cloud Storage."""
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     client = storage.Client(project=PROJECT_ID)
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
@@ -15,6 +19,7 @@ def download_from_gcs(bucket_name, blob_name):
 
 def upload_to_gcs(data, bucket_name, blob_name):
     """Uploads a DataFrame to Google Cloud Storage."""
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     client = storage.Client(project=PROJECT_ID)
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)

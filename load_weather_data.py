@@ -1,5 +1,12 @@
+import os
 import pandas as pd
 from google.cloud import storage
+
+
+# Set the project ID
+PROJECT_ID = "reflected-oath-405515"
+# Set the path to your JSON credentials file
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./terraform/reflected-oath-405515-70b04b6190ad.json"
 
 def load_weather_data():
     """
@@ -25,7 +32,8 @@ def load_weather_data():
     return weather_data_combined
 
 def upload_to_gcs(data, bucket_name, file_name):
-    client = storage.Client()
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    client = storage.Client(project=PROJECT_ID)
     bucket = client.get_bucket(bucket_name)
 
     # Convert DataFrame to CSV string
