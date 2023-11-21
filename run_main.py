@@ -5,10 +5,14 @@ from load_weather_data import load_weather_data
 from preprocess_data import *
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
+from google.cloud import storage
 
+# Load data directly from GCS:
+weather_data = download_from_gcs('data_bucket_processed', 'weather_data')
+energy_data = download_from_gcs('data_bucket_processed', 'energy_data')
 # Load data:
-weather_data = load_weather_data()
-energy_data = load_energy_data_from_csv()
+#weather_data = load_weather_data()
+#energy_data = load_energy_data_from_csv()
 
 # Preprocessing to join the data frames into one and do some cleaning
 data = preprocess_data(weather_data, energy_data)
