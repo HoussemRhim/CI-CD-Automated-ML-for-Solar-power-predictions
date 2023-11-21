@@ -18,6 +18,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Decode and save GCP_SA_KEY
+      run: echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > ${{ github.workspace }}/terraform/reflected-oath-405515-70b04b6190ad.json
+      
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
