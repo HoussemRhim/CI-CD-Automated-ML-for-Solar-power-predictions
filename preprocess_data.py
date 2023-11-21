@@ -6,7 +6,7 @@ from google.cloud import storage
 # Set the project ID
 PROJECT_ID = "reflected-oath-405515"
 # Set the path to your JSON credentials file
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./terraform/reflected-oath-405515-70b04b6190ad.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./reflected-oath-405515-70b04b6190ad.json"
 
 def download_from_gcs(bucket_name, blob_name):
     """Downloads a DataFrame from Google Cloud Storage."""
