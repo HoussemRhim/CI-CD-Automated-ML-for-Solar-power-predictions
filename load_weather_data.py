@@ -25,7 +25,7 @@ def load_weather_data():
 
     # Combine multiple years of weather data into one df
     weather_data_combined = pd.concat([df_2017, df_2018, df_2019], ignore_index=True)
-
+    weather_data = pd.read_csv(weather_data_combined)
     # Upload data to GCS bucket
     upload_to_gcs(weather_data_combined, 'data_bucket_raw', 'weather_data.csv')
 
