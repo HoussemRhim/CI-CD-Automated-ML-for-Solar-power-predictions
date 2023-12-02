@@ -74,7 +74,11 @@ def upload_to_gcs(data, bucket_name, file_name):
     :param bucket_name: Name of the GCS bucket
     :param file_name: Name for the destination blob in GCS
     """
+    
     try:
+        # Get the path to the JSON credentials file
+        credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+
         client = storage.Client(project=PROJECT_ID)
         bucket = client.get_bucket(bucket_name)
 
@@ -112,5 +116,6 @@ def load_weather_data():
     weather_data_combined = pd.read_csv(f'gs://data_bucket_raw/{destination_blob_name}')
 
     return weather_data_combined
+
 
     
