@@ -7,6 +7,21 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
 from google.cloud import storage
 
+
+# Set the project ID
+PROJECT_ID = "reflected-oath-405515"
+# Set the path to your JSON credentials file
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./terraform/reflected-oath-405515-70b04b6190ad.json"
+
+def download_from_gcs(bucket_name, blob_name):
+    """Downloads a DataFrame from Google Cloud Storage."""
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    client = storage.Client(project=PROJECT_ID)
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+    file_data = blob.download_as_text()
+    return pd.read_csv(pd.compat.StringIO(file_data))
+
 # Load data directly from GCS:
 weather_data = download_from_gcs('data_bucket_processed', 'weather_data')
 energy_data = download_from_gcs('data_bucket_processed', 'energy_data')
