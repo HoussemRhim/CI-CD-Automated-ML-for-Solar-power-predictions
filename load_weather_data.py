@@ -44,78 +44,42 @@ def upload_to_gcs(data, bucket_name, file_name):
     blob.upload_from_string(csv_data, content_type='text/csv')
 """
 
-def combine_and_upload_to_gcs(file_paths, bucket_name, destination_blob_name):
-    """
-    Combine multiple CSV files into one DataFrame and upload it to GCS.
+def upload_to_gcp(bucket_name, source_file_name, destination_blob_name):
+    """Uploads a file to the bucket."""
+    credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    # Create a client for interacting with Google Cloud Storage
+    storage_client = storage.Client()
 
-    :param file_paths: List of paths to CSV files
-    :param bucket_name: Name of the GCS bucket
-    :param destination_blob_name: Name for the destination blob in GCS
-    """
-    try:
-        # Combine CSV files into one DataFrame
-        weather_data_combined = pd.concat([pd.read_csv(file) for file in file_paths], ignore_index=True)
+    # Reference an existing bucket.
+    bucket = storage_client.bucket(bucket_name)
 
-
-        # Upload data to GCS bucket
-        upload_to_gcs(weather_data_combined, bucket_name, destination_blob_name)
-
-        print(f"Data uploaded to GCS: gs://{bucket_name}/{destination_blob_name}")
-
-    except Exception as e:
-        print(f"Error: {e}")
-        raise  # Re-raise the exception to halt execution
-
-def upload_to_gcs(data, bucket_name, file_name):
-    """
-    Upload a DataFrame to GCS.
-
-    :param data: DataFrame to upload
-    :param bucket_name: Name of the GCS bucket
-    :param file_name: Name for the destination blob in GCS
-    """
+    # Create a blob and upload the file
+    blob = bucket.blob(destination_blob_name)
     
-    try:
-        # Get the path to the JSON credentials file
-        credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    blob.upload_from_filename(source_file_name)
 
-        client = storage.Client(project=PROJECT_ID)
-        bucket = client.get_bucket(bucket_name)
+    print(f"File {source_file_name} uploaded to {destination_blob_name}.")
 
-        # Convert DataFrame to CSV string
-        csv_data = data.to_csv(index=False)
+def load_weather_data(bucket_name, destination_blob_name):
 
-        # Write CSV string to a temporary file
-        temp_file_name = "/tmp/temp_data.csv"
-        with open(temp_file_name, 'w') as file:
-            file.write(csv_data)
+    # Load each year file of data
+    df_2017 = pd.read_csv('./data/weather_2017.csv')
+    df_2018 = pd.read_csv('./data/weather_2018.csv')
+    df_2019 = pd.read_csv('./data/weather_2019.csv')
 
-        # Upload the file to GCS
-        blob = bucket.blob(file_name)
-        blob.upload_from_filename(temp_file_name)
+    # Combine multiple years of weather data into one df
+    weather_data_combined = pd.concat([df_2017, df_2018, df_2019], ignore_index=True)
+    
+    # Convert DataFrame to CSV file
+    csv_buffer = io.StringIO()
+    weather_data_combined.to_csv(csv_buffer, index=False)
 
-        # Remove the temporary file
-        os.remove(temp_file_name)
+    # Save CSV buffer to a temporary file
+    temp_csv_file = '/tmp/temp.csv'
+    with open(temp_csv_file, 'w') as f:
+        f.write(csv_buffer.getvalue())
 
-    except Exception as e:
-        print(f"Error: {e}")
-        raise  # Re-raise the exception to halt execution
-
-def load_weather_data():
-   
-# List of paths to CSV files
-    file_paths = ['./data/weather_2017.csv', './data/weather_2018.csv', './data/weather_2019.csv']
-
-# Destination blob name in GCS
-    destination_blob_name = 'weather_data.csv'
-
-    # Upload data to GCS bucket
-    combine_and_upload_to_gcs(file_paths, 'data_bucket_raw', destination_blob_name)
-
-    # Load the combined data from GCS
-    weather_data_combined = pd.read_csv(f'gs://data_bucket_raw/{destination_blob_name}')
+    # Upload the CSV file to the GCP bucket
+    upload_to_gcp('data_bucket_raw', temp_csv_file, 'weather_data.csv')
 
     return weather_data_combined
-
-
-    
