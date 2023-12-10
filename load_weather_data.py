@@ -75,7 +75,7 @@ def load_weather_data(bucket_name, destination_blob_name):
     weather_data_combined.to_csv(csv_buffer, index=False)
 
     # Save CSV buffer to a temporary file
-    temp_csv_file = '/tmp/temp.csv'
+    temp_csv_file = './data/temp.csv'
     with open(temp_csv_file, 'w') as f:
         f.write(csv_buffer.getvalue())
 
