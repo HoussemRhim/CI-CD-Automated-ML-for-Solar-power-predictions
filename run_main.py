@@ -22,16 +22,16 @@ def download_from_gcs(bucket_name, blob_name):
     file_data = blob.download_as_text()
     return pd.read_csv(pd.compat.StringIO(file_data))
 
+
+# Preprocessing to join the data frames into one and do some cleaning
+data = preprocess_data('data_bucket_raw', 'energy_data.csv', 'weather_data.csv')
+
 # Load data directly from GCS:
-weather_data = download_from_gcs('data_bucket_processed', 'weather_data')
-energy_data = download_from_gcs('data_bucket_processed', 'energy_data')
+#weather_data = download_from_gcs('data_bucket_processed', 'weather_data.csv')
+#energy_data = download_from_gcs('data_bucket_processed', 'energy_data.csv')
 # Load data:
 #weather_data = load_weather_data()
 #energy_data = load_energy_data_from_csv()
-
-# Preprocessing to join the data frames into one and do some cleaning
-data = preprocess_data(weather_data, energy_data)
-
 
 
 # Split into train and test data
@@ -53,6 +53,6 @@ print(f'Mean Absolute Error: {mae}')
 
 #Predict new data
 future_data = query_weather_from_api("Antwerp", 3, False)
-future_data = preprocess_api_forecast_data(future_data)
+future_data = preprocess_api_forecast_data(future_data, 'processed_forecast_data.csv')
 print(future_data)
 print(model.predict(future_data[["tavg", "tmin", "tmax"]]))

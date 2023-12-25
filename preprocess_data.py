@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from google.cloud import storage
-
+from io import StringIO
 
 # Set the project ID
 PROJECT_ID = "reflected-oath-405515"
@@ -15,7 +15,7 @@ def download_from_gcs(bucket_name, blob_name):
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     data = blob.download_as_text()
-    return pd.read_csv(pd.compat.StringIO(data))
+    return pd.read_csv(StringIO(data))
 
 def upload_to_gcs(data, bucket_name, blob_name):
     """Uploads a DataFrame to Google Cloud Storage."""
@@ -64,10 +64,11 @@ def preprocess_data(bucket_name, energy_blob_name, weather_blob_name):
     data = data.dropna()
 
     # Upload the processed data to GCS
-    upload_to_gcs(data, 'data_bucket_processed', 'data')
+    upload_to_gcs(data, 'data_bucket_processed', 'data.csv')
 
     return data
 
+"""
 def preprocess_api_forecast_data(json_data, output_blob_name):
     # We only need the daily forecast from the json payload
     forecast = json_data["forecast"]["forecastday"]
@@ -84,6 +85,31 @@ def preprocess_api_forecast_data(json_data, output_blob_name):
 
     # Rename to the same names as in the csv data
     forecast_df = forecast_df.rename(columns = {"maxtemp_c": "tmax", "mintemp_c": "tmin", "avgtemp_c": "tavg"})
+
+    forecast_df["date"] = dates
+    
+    # Upload the processed forecast data to GCS
+    upload_to_gcs(forecast_df, 'data_bucket_processed', 'processed_forecast_data.csv')
+
+    return forecast_df
+"""
+
+def preprocess_api_forecast_data(json_data, output_blob_name):
+    # We only need the daily forecast from the json payload
+    forecast = json_data["forecast"]["forecastday"]
+
+    # We extract the date and temperatures from each forecast day
+    dates = [key["date"] for key in forecast]
+    days = [key["day"] for key in forecast]
+
+    # Create a df from those datapoints
+    forecast_df = pd.DataFrame.from_dict(days)
+
+    # Just take the temperature columns
+    forecast_df = forecast_df[["maxtemp_c", "mintemp_c", "avgtemp_c"]]
+
+    # Rename to the same names as in the csv data
+    forecast_df = forecast_df.rename(columns={"maxtemp_c": "tmax", "mintemp_c": "tmin", "avgtemp_c": "tavg"})
 
     forecast_df["date"] = dates
     
