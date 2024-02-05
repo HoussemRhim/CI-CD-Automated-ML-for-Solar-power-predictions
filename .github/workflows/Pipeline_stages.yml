@@ -68,7 +68,7 @@ jobs:
         run: load_weather_data.py
 
   build_and_run:
-    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule'
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'schedule' && needs.load_data.result == 'success')
     needs: [terraform_deploy, load_data]
     runs-on: ubuntu-latest
     steps:
