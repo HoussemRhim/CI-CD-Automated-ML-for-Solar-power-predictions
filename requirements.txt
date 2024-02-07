@@ -4,3 +4,4 @@ twilio
 matplotlib
 scikit-learn
 google-cloud-storage
+Seaborn
